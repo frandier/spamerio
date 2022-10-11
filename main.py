@@ -40,7 +40,7 @@ def main():
 def new_database():
     try:
         client = MongoClient(os.environ.get("mongo_uri"))
-        db = client.test
+        db = client.twitter
         return db
     except:
         print("Could not connect to MongoDB")
