@@ -17,7 +17,8 @@ def main():
 
     try:
         query = str(input("Enter a search query: "))
-        tweets = client.get_tweets(query, 1, "4.570868,-74.297333,100km")
+        total = int(input("Enter the number of tweets to collect: "))
+        tweets = client.get_tweets(query, total, "4.570868,-74.297333,100km")
     except:
         print("Could not get tweets")
         sys.exit(1)
