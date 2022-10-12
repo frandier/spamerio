@@ -5,7 +5,6 @@ import numpy as np
 import spacy
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from nltk.stem import SnowballStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from art import tprint
 
@@ -13,8 +12,6 @@ from twitter import twitter
 from cleaner import cleaner
 
 def main():
-    tprint("SPAMERIO", font="rnd-medium")
-
     db = new_database()
     client = twitter.Twitter(
         os.environ.get("consumer_key"), 
@@ -31,15 +28,46 @@ def main():
         max_features=None
     )
 
-    """ tweets = get_tweets_from_twitter(client)
-    save_tweets(db, tweets) """
+    tprint("SPAMERIO", font="rnd-medium")
+    print("A spam detection system for Twitter by @frandier")
+    print("=================================================")
+    
+    menu = """
+    1. Get tweets from Twitter
+    2. Clean and normalize tweets
+    3. Feature extraction
+    4. Sparse matrix problem
+    5. Exit
+    """
+    print(menu)
 
-    df = clean_and_normalize_tweets(db, clean, nlp)
-    fit_transform = feature_extraction(df, vectorizer)
-
-    # Sparse matrix problem
-    with np.printoptions(threshold=np.inf):
-        print(fit_transform[len(df)-1])
+    while True:
+        option = int(input("Enter an option: "))
+        if option == 1:
+            tweets = get_tweets_from_twitter(client)
+            save_tweets(db, tweets)
+        elif option == 2:
+            df = clean_and_normalize_tweets(db, clean, nlp)
+            print(df.head())
+        elif option == 3:
+            try:
+                fit_transform = feature_extraction(df, vectorizer)
+                print(fit_transform)
+            except NameError:
+                print("You must clean and normalize tweets first")
+                continue
+        elif option == 4:
+            try:
+                with np.printoptions(threshold=np.inf):
+                    print(fit_transform[len(df)-1])
+            except NameError:
+                print("You must run step 2 and 3 first")
+                continue
+        elif option == 5:
+            print("Bye!")
+            sys.exit(0)
+        else:
+            print("Invalid option")
 
 def new_database():
     try:
@@ -57,7 +85,7 @@ def get_tweets_from_twitter(client):
         return tweets
     except:
         print("Could not get tweets")
-        sys.exit(1)
+        sys.exit(0)
 
 def save_tweets(db, tweets):
     for tweet in tweets:
