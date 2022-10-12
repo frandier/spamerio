@@ -9,3 +9,7 @@ class Cleaner:
         r = re.sub("(\w+:\/\/\S+)",' ', r)
         r = ' '.join(r.split())
         return r
+
+    def lemma_stopwords_tweet(self, tweet):
+        txt = [token.lemma_ for token in tweet if not token.is_stop]
+        return ' '.join(txt)
