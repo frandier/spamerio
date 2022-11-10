@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import spacy
 from dotenv import load_dotenv
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 from sklearn.feature_extraction.text import TfidfVectorizer
 from art import tprint
 
@@ -73,6 +73,7 @@ def new_database():
     try:
         client = MongoClient(os.environ.get("mongo_uri"))
         db = client.twitter
+        db.tweets.create_index([('id', ASCENDING)], unique=True)
         return db
     except:
         print("Could not connect to MongoDB")
@@ -90,6 +91,7 @@ def get_tweets_from_twitter(client):
 def save_tweets(db, tweets):
     for tweet in tweets:
         tw = {
+            "id": tweet.id,
             "text": tweet.text,
             "user": tweet.user.screen_name,
             "location": tweet.user.location,
@@ -100,7 +102,7 @@ def save_tweets(db, tweets):
             tw_id = db.tweets.insert_one(tw).inserted_id
             print("Tweet inserted with id: ", tw_id)
         except:
-            print("Could not insert tweet")
+            print("Could not insert tweet", tweet.id)
 
 def clean_and_normalize_tweets(db, clean, nlp):
     tweets = db.tweets.find()
